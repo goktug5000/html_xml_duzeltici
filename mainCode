@@ -1,0 +1,178 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace XMLDuzenleyici
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+
+            /*
+            using (StreamWriter sw = File.AppendText(destFile))
+            {
+                sw.WriteLine("This");
+                sw.WriteLine("is Extra");
+                sw.WriteLine("Text");
+            }
+            */
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string sourceDir;       
+            string backupDir;
+            string myName;
+
+            string myFrom;
+            string degisecek;
+            string myTill;
+
+            string onDuzeltme;
+            string sonDuzeltme;
+            
+
+            sourceDir = pathh.Text;
+            backupDir = pathh.Text;
+            myName = nameOfIt.Text;
+
+            myFrom = Fromm.Text;
+            degisecek = mustHavee.Text;
+            myTill = tilll.Text;
+
+            onDuzeltme = onEkk.Text;
+            sonDuzeltme = sonEkk.Text;
+            
+            /*
+            sourceDir = @"D:\";
+            backupDir = @"D:\";
+            myName = "kimlikKarti.html";
+
+            myFrom = "<div>";
+            degisecek = "<p>dil</p>";
+            myTill = "</div>";
+
+            onDuzeltme = "<!--";
+            sonDuzeltme = "-->";
+            */
+
+            string sourceFile = System.IO.Path.Combine(sourceDir, myName);
+            string destFile = System.IO.Path.Combine(backupDir, ("yenisi_"+myName));
+            string finalFile = System.IO.Path.Combine(backupDir, ("final_" + myName));
+            using (File.Create(finalFile));
+
+            string line;
+
+            File.Copy(sourceFile, destFile, true);
+
+            int[] hatalilar = new int[30];
+            int hataSayisi = 0;
+
+            int lineCount = File.ReadLines(destFile).Count();
+
+            MessageBox.Show(lineCount.ToString()+" satır var");
+
+            for(int i = 1; i <= lineCount; i++)
+            {
+                line = File.ReadLines(destFile).Skip((i-1)).Take(1).First();
+                bool patlakOlcacak = line.Contains(degisecek);
+                if (patlakOlcacak == true)
+                {
+                    MessageBox.Show("değişecek kelime bulundu " + i.ToString());
+
+                    bool ilkBulundu = false;
+                    bool sonBulundu = false;
+
+                    int ilkSayi = i;
+                    int sonSayi = i;
+
+                    while (ilkBulundu == false)
+                    {
+                        ilkSayi--;
+                        string lineFrs = File.ReadLines(destFile).Skip((ilkSayi - 1)).Take(1).First();
+                        ilkBulundu = lineFrs.Contains(myFrom);
+
+                    }
+                    hatalilar[hataSayisi] = ilkSayi;
+                    hataSayisi++;
+
+                    while (sonBulundu == false)
+                    {
+                        sonSayi++;
+                        string lineSon = File.ReadLines(destFile).Skip((sonSayi - 1)).Take(1).First();
+                        sonBulundu = lineSon.Contains(myTill);
+
+                    }
+                    hatalilar[hataSayisi] = sonSayi;
+                    hataSayisi++;
+                }
+
+                Console.WriteLine(line);
+            }
+
+            int duzeltmeSayisi = 0;
+
+            /*
+            for(int q = 0; q< 10; q++)
+            { 
+                if (hatalilar[q] == 0)
+                {
+                    break;
+                }
+
+
+                if ((duzeltmeSayisi % 2) == 0)
+                {
+                    MessageBox.Show(onDuzeltme + hatalilar[q].ToString());
+                }
+                if ((duzeltmeSayisi % 2) == 1)
+                {
+                    MessageBox.Show(hatalilar[q].ToString() + sonDuzeltme);
+                }
+                duzeltmeSayisi++;
+            }
+            */
+
+
+            for (int w = 1; w <= lineCount; w++)
+            {
+                line = File.ReadLines(destFile).Skip((w-1)).Take(1).First();
+
+                
+                if(w == hatalilar[duzeltmeSayisi])
+                {
+                    if ((duzeltmeSayisi % 2) == 0)
+                    {
+                        line = (onDuzeltme + line);
+                    }
+                    if ((duzeltmeSayisi % 2) == 1)
+                    {
+                        line = (line + sonDuzeltme);
+                    }
+                    duzeltmeSayisi++;
+                }
+
+                
+                
+                using (StreamWriter sw = File.AppendText(finalFile))
+                {
+                    sw.WriteLine(line);
+                }
+                
+
+            }
+            MessageBox.Show("tamamlandı");
+
+
+           
+        }
+    }
+}
